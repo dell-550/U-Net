@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像上传与显示</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 图片上传和显示原始图片的部分 -->
+        <div class="image-upload">
+            <h2>上传原始图片</h2>
+
+            <img id="originalImage" src="" alt="原始图片" style="display: none;">
+             <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <!-- 显示后台返回图片的部分 -->
+        <div class="processed-image">
+            <h2>后台返回图片</h2>
+            <img id="returnedImage" src="" alt="返回的图片" style="display: none;">
+        </div>
+             <div class="parameters">
+                <h2>参数信息</h2>
+                <div class="info-panel">
+                    <ul>
+                        <li><strong>文件名：</strong><span id="file-name">未上传</span></li>
+<!--                        <li><strong>图片尺寸：</strong><span id="image-size"></span></li>-->
+                        <li><strong>文件大小：</strong><span id="file-size"></span></li>
+                        <li><strong>图片格式：</strong><span id="format"></span></li>
+<!--                        <li><strong>上传时间：</strong><span id="upload-time"></span></li>-->
+                        <li><strong>模型名称：</strong><span id="model-name"></span></li>
+                            <li><strong>模型位置：</strong><span id="model-path"></span></li>
+                        <li><strong>推理时间：</strong><span id="inference-time"></span></li>
+                        <li><strong>分割类别：</strong><span id="classes"></span></li>
+                        <li><strong>分割图尺寸：</strong><span id="segmented-size"></span></li>
+                        <li><strong>图片保存路径：</strong><span id="save-path"></span></li>
+                    </ul>
+                </div>
+            </div>
+    </div>
+
+    <script src="../static/js/script.js"></script>
+</body>
+</html>
