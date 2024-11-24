@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+
+.container {
+    position: relative; /* 使子元素可以使用绝对定位 */
+    width: 668px; /* 宽度 */
+    height: 376px; /* 高度 */
+    overflow: hidden; /* 防止子元素超出容器 */
+}
+    .videos {
+        position: absolute; /* 绝对定位，与容器对齐 */
+    top: 0;
+    left: 0;
+
+    width: 100%; /* 填满容器宽度 */
+    height: 100%; /* 填满容器高度 */
+      position: relative;
+      /* background-color: black; */
+      mask-image: url('./static/mask_image_59.svg');
+            mask-size: 668px 376px;
+            opacity: 1;
+            z-index: 1;
+    }
+    .video {
+        position: absolute; /* 绝对定位，与容器对齐 */
+    top: 0;
+    left: 0;
+
+    width: 100%; /* 填满容器宽度 */
+    height: 100%; /* 填满容器高度 */
+      /* position: relative; */
+      /* background-color: black; */
+/* z-index: 2; */
+    }
+    .bullet {
+        position: absolute; /* 绝对定位，与容器对齐 */
+    top: 0;
+    left: 0;
+
+    width: 100%; /* 填满容器宽度 */
+    height: 100%; /* 填满容器高度 */
+      font-size: 20px;
+      color: rgb(143, 55, 55);
+      animation: ani 5s linear infinite;
+      /* z-index: 3; */
+    }
+    .showBullet {
+      position: absolute;
+      font-size: 20px;
+      color: red;
+      animation: show 5s linear infinite;
+    }
+
+    @keyframes ani {
+      0% {
+        transform: translateX(668px);
+      }
+      100% {
+        transform: translateX(-668px);
+      }
+    }
+
+    @keyframes show {
+      0% {
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="videos">
+            <div class="bullet" style="left: 100px; top: 120px;">鸡你太美，鸡你太美</div>
+            <div class="bullet" style="left: 200px; top: 60px;">小黑子，哥哥下蛋你别吃</div>
+            <div class="bullet" style="left: 500px; top: 60px;">食不食油饼</div>
+            <div class="bullet" style="left: 300px; top: 140px;">鸡哥</div>
+            <div class="bullet" style="left: 400px; top: 100px;">铁山靠</div>
+            <!-- <div class="showBullet" style="left: 320px; top: 20px;">完结撒花</div>
+            <div class="showBullet" style="left: 340px; top: 50px;">泪目</div> -->
+          </div>
+        <video class="video" id="my-video" autoplay muted loop>
+                    <source src="./static/807427488-1-208.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+    </div>
+
+<script>
+        const video = document.getElementById('my-video');
+        const mask = document.querySelector('.videos');
+        function sendRequest(playTime) {
+            console.log("发送请求到后台...");
+            const url = `/mask-image`;
+            // 示例的后台请求，这里使用 fetch 发送请求
+            fetch(url, {
+                method: 'POST', // 请求方法
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: playTime }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('后台响应:', data.data.path);
+                // maskImage.src = data.data.path;
+                mask.style.maskImage  = `url(${data.data.path})`;
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+            });
+        }
+        
+        video.addEventListener('timeupdate', () => {
+            // 获取当前播放时间
+            playTime = Math.floor(video.currentTime);
+            // 更新显示的播放时间
+            console.log(playTime);
+            // playTimeDisplay.textContent = playTime;
+            // 发送请求到后台
+            sendRequest(playTime);
+        });
+</script>
+ 
+
+</body>
+</html>

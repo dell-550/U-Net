@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放与动态弹幕</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #video-container {
+            position: relative;
+        }
+        .video {
+      width: 668px;
+      height: 376px;
+      position: relative;
+      background-color: black;
+      /* mask-image: url("");
+      mask-size: 668px 376px;
+      mask-image: url('mask-image.png');          对标准浏览器有效 */
+
+
+        /* mask-size: cover;
+
+
+    mask-repeat: no-repeat;
+
+    mask-position: center; */
+    }
+    
+        #mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none; /* 使掩码图片不干扰视频播放 */
+        }
+        #danmaku-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            pointer-events: none; /* 使弹幕不干扰视频播放 */
+            width: 100%;
+            height: 100%;
+        }
+        .danmaku {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            animation: move 10s linear infinite;
+        }
+        @keyframes move {
+            from {
+                left: 100%;
+            }
+            to {
+                left: -100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="my-video" controls>
+            <source src="./static/807427488-1-208.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <!-- <img id="mask" src="" alt="mask" /> -->
+        <div id="danmaku-container"></div>
+    </div>
+
+    <script>
+        const video = document.getElementById('my-video');
+        // const maskImage = document.getElementById('mask');
+        const danmakuContainer = document.getElementById('danmaku-container');
+        
+        // 假设帧率为 30 FPS
+        const fps = 30;
+        const frameInterval = 1000 / fps;
+        
+        let intervalId = null;
+
+        // 定时向后台发送请求的函数
+        function sendRequest(playTime) {
+            console.log("发送请求到后台...");
+            const url = `/mask-image`;
+            // 示例的后台请求，这里使用 fetch 发送请求
+            fetch(url, {
+                method: 'POST', // 请求方法
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: playTime, fps: fps }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('后台响应:', data.data.path);
+                // maskImage.src = data.data.path;
+                video.style.maskImage = `url(${data.data.path})`;
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+            });
+        }
+        
+        video.addEventListener('timeupdate', () => {
+            // 获取当前播放时间
+            playTime = Math.floor(video.currentTime);
+            // 更新显示的播放时间
+            console.log(playTime);
+            // playTimeDisplay.textContent = playTime;
+            // 发送请求到后台
+            sendRequest(playTime);
+        });
+        // // 视频播放事件，开始定时请求
+        // video.addEventListener('play', () => {
+        //     console.log("视频开始播放");
+        //     // 如果已经有定时器在运行，先清除它
+        //     if (intervalId !== null) {
+        //         clearInterval(intervalId);
+        //     }
+        //     // 每0.5秒发送一次请求
+        //     intervalId = setInterval(sendRequest, 500); // 500ms 即每 0.5 秒
+        // });
+
+        // 视频暂停事件，停止定时请求
+        video.addEventListener('pause', () => {
+            console.log("视频已暂停");
+            // 清除定时器停止请求
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        });
+
+        // 视频结束事件，停止定时请求
+        video.addEventListener('ended', () => {
+            console.log("视频播放结束");
+            // 清除定时器停止请求
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        });
+
+        // 模拟弹幕数据并显示
+        function createDanmaku(text, position) {
+            const danmaku = document.createElement('div');
+            danmaku.classList.add('danmaku');
+            danmaku.textContent = text;
+            danmaku.style.top = `${position.top}px`;
+            danmaku.style.left = '100%';  // 弹幕从右侧进入
+            danmakuContainer.appendChild(danmaku);
+
+            // 动画控制，模拟弹幕从右至左
+            setTimeout(() => {
+                danmaku.style.animation = 'move 10s linear infinite';
+            }, 0);
+        }
+
+        // 模拟弹幕内容
+        video.addEventListener('play', () => {
+            let topPosition = 0;
+            setInterval(() => {
+                createDanmaku('这是一个动态弹幕！', { top: topPosition });
+                topPosition += 40;  // 控制弹幕的垂直间距
+                if (topPosition > video.videoHeight) topPosition = 0;  // 避免弹幕溢出
+            }, 3000);  // 每 3 秒出现一个新弹幕
+        });
+    </script>
+</body>
+</html>
